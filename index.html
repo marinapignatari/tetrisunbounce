@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tetris</title>
+    <style>
+        /* Adicione seu estilo CSS aqui */
+    </style>
+</head>
+<body>
+    <canvas id="tetris" width="300" height="600"></canvas>
+    <div id="message" style="display:none;">
+        <h1>Você ganhou um cupom de 50% de desconto!</h1>
+        <p>Use o código: BOOTCAMP50</p>
+    </div>
+    <script>
+        // Adicione seu código JavaScript para Tetris aqui
+
+        let canvas = document.getElementById('tetris');
+        let context = canvas.getContext('2d');
+
+        context.scale(20, 20);
+
+        function arenaSweep() {
+            let rowCount = 1;
+            outer: for (let y = arena.length - 1; y > 0; --y) {
+                for (let x = 0; x < arena[y].length; ++x) {
+                    if (arena[y][x] === 0) {
+                        continue outer;
+                    }
+                }
+
+                const row = arena.splice(y, 1)[0].fill(0);
+                arena.unshift(row);
+                ++y;
+
+                player.score += rowCount * 10;
+                rowCount *= 2;
+            }
+
+            if (player.score >= 50) {
+                document.getElementById('message').style.display = 'block';
+            }
+        }
+
+        // Restante do código do jogo Tetris
+
+        function updateScore() {
+            document.getElementById('score').innerText = player.score;
+        }
+
+        const arena = createMatrix(12, 20);
+
+        const player = {
+            pos: {x: 0, y: 0},
+            matrix: null,
+            score: 0,
+        };
+
+        function createMatrix(w, h) {
+            const matrix = [];
+            while (h--) {
+                matrix.push(new Array(w).fill(0));
+            }
+            return matrix;
+        }
+
+        // Inicie o jogo
+        playerReset();
+        updateScore();
+        update();
+    </script>
+</body>
+</html>

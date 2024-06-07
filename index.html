@@ -1,57 +1,121 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tetris</title>
+    <title>Jogo de Pesca de Descontos</title>
     <style>
-        /* Adicione aqui o seu CSS para o jogo */
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: url('background.png') no-repeat center center fixed;
+            background-size: cover;
+        }
+        canvas {
+            display: block;
+        }
+        .info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #fff;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <!-- Seu jogo Tetris aqui -->
-        <div id="score-container">
-            Pontuação: <span id="score">0</span>
-        </div>
-        <div id="discount-message" style="display: none; color: red; font-size: 20px; margin-top: 20px;"></div>
+    <canvas id="gameCanvas"></canvas>
+    <div class="info">
+        <p>Peixes pescados: <span id="fishCount">0</span></p>
     </div>
     <script>
-        // Variável para armazenar a pontuação
-        let score = 0;
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
 
-        // Função para atualizar a pontuação
-        function updateScore(points) {
-            score += points;
-            document.getElementById('score').innerText = score;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-            // Verificação da pontuação
-            if (score >= 50) {
-                showDiscountMessage();
+        let fishCount = 0;
+
+        const fishermanImg = new Image();
+        fishermanImg.src = 'https://path/to/fisherman.png'; // Substitua pelo caminho correto da imagem do pescador
+        const fishImg = new Image();
+        fishImg.src = 'https://path/to/fish.png'; // Substitua pelo caminho correto da imagem do peixe
+
+        const fisherman = {
+            x: canvas.width / 2,
+            y: canvas.height - 150,
+            width: 50,
+            height: 50,
+            dx: 5
+        };
+
+        const fish = {
+            x: Math.random() * canvas.width,
+            y: 0,
+            width: 30,
+            height: 30,
+            dy: 2
+        };
+
+        function drawFisherman() {
+            ctx.drawImage(fishermanImg, fisherman.x, fisherman.y, fisherman.width, fisherman.height);
+        }
+
+        function drawFish() {
+            ctx.drawImage(fishImg, fish.x, fish.y, fish.width, fish.height);
+        }
+
+        function updateFish() {
+            fish.y += fish.dy;
+            if (fish.y + fish.height > canvas.height) {
+                fish.x = Math.random() * canvas.width;
+                fish.y = 0;
+            }
+            if (fish.y + fish.height > fisherman.y &&
+                fish.x + fish.width > fisherman.x &&
+                fish.x < fisherman.x + fisherman.width) {
+                fishCount++;
+                document.getElementById('fishCount').textContent = fishCount;
+                fish.x = Math.random() * canvas.width;
+                fish.y = 0;
             }
         }
 
-        // Função para mostrar a mensagem de desconto
-        function showDiscountMessage() {
-            document.getElementById('discount-message').innerText = "Você ganhou um cupom com 50% de desconto para a assinatura do Bootcamp Pass";
-            document.getElementById('discount-message').style.display = 'block';
+        function updateFisherman() {
+            if (keys.right && fisherman.x + fisherman.width < canvas.width) {
+                fisherman.x += fisherman.dx;
+            }
+            if (keys.left && fisherman.x > 0) {
+                fisherman.x -= fisherman.dx;
+            }
         }
 
-        // Exemplo de função que pode ser chamada quando o jogo é iniciado
-        function startGame() {
-            // Configurações iniciais do jogo
-            score = 0;
-            document.getElementById('score').innerText = score;
-            document.getElementById('discount-message').style.display = 'none';
-            // Mais código para iniciar o jogo
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawFisherman();
+            drawFish();
+            updateFish();
+            updateFisherman();
+            requestAnimationFrame(draw);
         }
 
-        // Iniciar o jogo ao carregar a página
-        window.onload = startGame;
+        const keys = {
+            right: false,
+            left: false
+        };
 
-        // Exemplo de como a pontuação pode ser atualizada durante o jogo
-        // Você deve chamar essa função sempre que a pontuação for atualizada no seu jogo Tetris
-        // Exemplo: updateScore(10);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') keys.right = true;
+            if (e.key === 'ArrowLeft') keys.left = true;
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowRight') keys.right = false;
+            if (e.key === 'ArrowLeft') keys.left = false;
+        });
+
+        draw();
     </script>
 </body>
 </html>
